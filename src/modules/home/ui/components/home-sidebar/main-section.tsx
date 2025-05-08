@@ -1,5 +1,6 @@
 'use client';
 import { FlameIcon, HomeIcon, PlaySquareIcon } from 'lucide-react';
+import { useAuth, useClerk } from '@clerk/nextjs';
 
 import {
   SidebarGroup,
@@ -29,6 +30,8 @@ const items = [
   },
 ];
 export const MainSection = () => {
+  const { isSignedIn } = useAuth();
+  const clerk = useClerk();
   return (
     <SidebarGroup>
       <SidebarGroupContent>
@@ -36,7 +39,12 @@ export const MainSection = () => {
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
-                onClick={() => {}}
+                onClick={(e) => {
+                  if (!isSignedIn && item.auth) {
+                    e.preventDefault();
+                    return clerk.openSignIn();
+                  }
+                }}
                 isActive={false}
                 tooltip={item.title}
                 asChild
