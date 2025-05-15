@@ -62,6 +62,34 @@ export const POST = async (request: Request) => {
       break;
     }
 
+    case 'video.asset.ready': {
+      const data = payload.data as VideoAssetCreatedWebhookEvent['data'];
+      const playbackId = data.playback_ids?.[0].id;
+
+      if (!data.upload_id) {
+        return new Response('No upload ID found', { status: 400 });
+      }
+      if (!playbackId) {
+        return new Response('No playbackId found', { status: 400 });
+      }
+
+      const thumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+      const previewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
+      const duration = data.duration ? Math.round(data.duration * 1000) : 0;
+      await db
+        .update(videos)
+        .set({
+          muxAssetId: data.id,
+          muxStatus: data.status,
+          muxPlaybackId: playbackId,
+          thumbnailUrl,
+          previewUrl,
+          duration,
+        })
+        .where(eq(videos.muxUploadId, data.upload_id));
+      break;
+    }
+
     case 'video.asset.errored': {
       const data = payload.data as VideoAssetErroredWebhookEvent['data'];
 
