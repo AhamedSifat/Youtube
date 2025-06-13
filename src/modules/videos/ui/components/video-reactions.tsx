@@ -5,12 +5,14 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { VideoGetOneOutput } from '../../type';
+import { useClerk } from '@clerk/nextjs';
+import { trpc } from '@/trpc/client';
 
 interface VideoReactionsProps {
   videoId: string;
   likes: number;
   dislikes: number;
-  viewerReaction: string | null;
+  viewerReaction: VideoGetOneOutput['viewerRection'];
 }
 
 export const VideoReactions = ({
@@ -19,11 +21,34 @@ export const VideoReactions = ({
   dislikes,
   viewerReaction,
 }: VideoReactionsProps) => {
+  const clerk = useClerk();
+  const utils = trpc.useUtils();
+  const like = trpc.videoReactions.like.useMutation({
+    onSuccess: () => {
+      utils.videos.getOne.invalidate({ id: videoId });
+    },
+    onError: (error) => {
+      if (error.data?.code === 'UNAUTHORIZED') {
+        clerk.openSignIn();
+      }
+    },
+  });
+  const dislike = trpc.videoReactions.disLike.useMutation({
+    onSuccess: () => {
+      utils.videos.getOne.invalidate({ id: videoId });
+    },
+    onError: (error) => {
+      if (error.data?.code === 'UNAUTHORIZED') {
+        clerk.openSignIn();
+      }
+    },
+  });
+
   return (
     <div className='flex items-center flex-none'>
       <Button
-        onClick={() => {}}
-        disabled={false}
+        onClick={() => like.mutate({ videoId })}
+        disabled={like.isPending || dislike.isPending}
         variant='secondary'
         className='rounded-l-full rounded-r-none gap-2 pr-4'
       >
@@ -34,8 +59,8 @@ export const VideoReactions = ({
       </Button>
       <Separator orientation='vertical' className='h-7' />
       <Button
-        onClick={() => {}}
-        disabled={false}
+        onClick={() => dislike.mutate({ videoId })}
+        disabled={like.isPending || dislike.isPending}
         variant='secondary'
         className='rounded-l-none rounded-r-full pl-3'
       >

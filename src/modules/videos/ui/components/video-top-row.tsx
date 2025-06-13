@@ -36,9 +36,9 @@ export const VideoTopRow = ({ video }: { video: VideoGetOneOutput }) => {
         <div className='flex items-center overflow-x-auto sm:min-w-[calc(50%-6px)] sm:justify-end sm:overflow-visible pb-2 -mb-2 sm:pb-0 sm:mb-0 gap-2'>
           <VideoReactions
             videoId={video.id}
-            likes={6}
-            dislikes={3}
-            viewerReaction={'like'}
+            likes={video.likeCounts}
+            dislikes={video.dislikeCounts}
+            viewerReaction={video.viewerRection}
           />
           <VideoMenu videoId={video.id} variant='secondary' />
         </div>
