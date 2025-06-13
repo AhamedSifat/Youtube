@@ -1,7 +1,6 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useRouter } from 'next/navigation';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useQueryState } from 'nuqs';
 
@@ -26,6 +25,7 @@ export const CategoriesSectionSkeleton = () => {
   return <FilterCarousel isLoading data={[]} onSelect={() => {}} />;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CategoriesSectionSuspense = ({ categoryId }: CategoriesSectionProps) => {
   const [categories] = trpc.categories.getMany.useSuspenseQuery();
 

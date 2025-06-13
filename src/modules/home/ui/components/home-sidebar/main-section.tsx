@@ -32,6 +32,8 @@ const items = [
 export const MainSection = () => {
   const { isSignedIn } = useAuth();
   const clerk = useClerk();
+
+  console.log('MainSection rendered', isSignedIn);
   return (
     <SidebarGroup>
       <SidebarGroupContent>

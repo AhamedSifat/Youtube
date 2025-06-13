@@ -41,6 +41,7 @@ export const studioRouter = createTRPCRouter({
         )
         .orderBy(desc(videos.updatedAt), desc(videos.id))
         .limit(limit + 1);
+
       const hasNextPage = data.length > limit;
       const items = hasNextPage ? data.slice(0, -1) : data;
 
